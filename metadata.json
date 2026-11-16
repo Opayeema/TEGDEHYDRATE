@@ -1,0 +1,8 @@
+{
+  "name": "TEG Gas Dehydration Unit 3D Simulation",
+  "description": "Interactive 3D process simulation of a Triethylene Glycol (TEG) natural gas dehydration skid with live stream animations, thermodynamics, cutaway vessels, and HMI alarm monitoring.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
