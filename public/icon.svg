@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <rect width="512" height="512" fill="#14181B"/>
+  <rect x="24" y="24" width="464" height="464" fill="none" stroke="#2C363C" stroke-width="8"/>
+  <!-- Grid accent lines -->
+  <line x1="24" y1="408" x2="488" y2="408" stroke="#2C363C" stroke-width="6"/>
+  <!-- Wet gas inlet riser (amber) -->
+  <path d="M56 368 H108 V332 H128" fill="none" stroke="#D9A441" stroke-width="18" stroke-linecap="square" stroke-linejoin="miter"/>
+  <!-- Dry gas outlet from top of absorber (teal) -->
+  <path d="M168 96 V56 H436 V108" fill="none" stroke="#5FD0C4" stroke-width="18" stroke-linecap="square" stroke-linejoin="miter"/>
+  <!-- Rich TEG bottom loop to reboiler (burnt orange) -->
+  <path d="M168 384 V424 H276 V360" fill="none" stroke="#B8642E" stroke-width="16" stroke-linecap="square" stroke-linejoin="miter"/>
+  <!-- Lean TEG return loop from reboiler to absorber top (pale gold) -->
+  <path d="M408 320 H448 V148 H208" fill="none" stroke="#E8C766" stroke-width="16" stroke-linecap="square" stroke-linejoin="miter"/>
+  <!-- V-101 Absorber Tower -->
+  <rect x="128" y="96" width="80" height="288" rx="4" fill="#1A2024" stroke="#5FD0C4" stroke-width="14"/>
+  <line x1="142" y1="158" x2="194" y2="158" stroke="#5FD0C4" stroke-width="10"/>
+  <line x1="142" y1="212" x2="194" y2="212" stroke="#E8C766" stroke-width="10"/>
+  <line x1="142" y1="266" x2="194" y2="266" stroke="#D9A441" stroke-width="10"/>
+  <line x1="142" y1="320" x2="194" y2="320" stroke="#B8642E" stroke-width="10"/>
+  <!-- H-101 Still Column + Reboiler Vessel -->
+  <rect x="308" y="180" width="44" height="96" fill="#1A2024" stroke="#8E9AA0" stroke-width="12"/>
+  <line x1="330" y1="180" x2="330" y2="140" stroke="#E8E4D8" stroke-width="12"/>
+  <rect x="256" y="276" width="152" height="84" rx="8" fill="#1A2024" stroke="#8E9AA0" stroke-width="14"/>
+  <!-- Reboiler Fire-Tube Glow -->
+  <rect x="280" y="308" width="104" height="24" rx="4" fill="#F26B21"/>
+  <!-- Status healthy indicator dot -->
+  <circle cx="436" cy="444" r="14" fill="#7BC96F"/>
+</svg>

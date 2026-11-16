@@ -8,6 +8,14 @@
   <meta property="og:title" content="TEG Rig Simulator — Gas Dehydration Process Game" />
   <meta property="og:description" content="Interactive 3D TEG gas dehydration simulation game with career ranks, field actions, and live certification exam." />
   <meta property="og:type" content="website" />
+  <meta name="theme-color" content="#14181B" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="TEG Rig" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="icon" type="image/svg+xml" href="/icon.svg" />
+  <script type="module" src="/src/pwaBoot.ts"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
@@ -660,6 +668,39 @@
       text-align: center;
     }
     #webgl-fallback.open { display: flex; }
+
+    /* Offline Connectivity Badge */
+    #offline-chip {
+      position: fixed;
+      bottom: calc(var(--safe-b) + 36px);
+      right: var(--safe-r);
+      z-index: 80;
+      display: none;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 10px;
+      background: #1A2024;
+      border: 1px solid var(--wet-gas);
+      border-radius: var(--radius);
+      color: var(--wet-gas);
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      pointer-events: none;
+    }
+    #offline-chip.show { display: inline-flex; }
+    .offline-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--wet-gas); flex-shrink: 0; }
+    .install-steps {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding-left: 18px;
+      font-size: 13px;
+      line-height: 1.45;
+      color: var(--text);
+    }
   </style>
 </head>
 <body data-state="title">
@@ -711,6 +752,9 @@
       <symbol id="ic-thermo" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square">
         <path d="M14 14.8V5a2 2 0 0 0-4 0v9.8a4 4 0 1 0 4 0z"/>
       </symbol>
+      <symbol id="ic-download" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square">
+        <path d="M12 3v12"/><polyline points="7 11 12 16 17 11"/><path d="M4 17v3h16v-3"/>
+      </symbol>
     </defs>
   </svg>
 
@@ -758,6 +802,9 @@
         <button type="button" class="btn btn-primary" id="btn-start-career" data-start="true">Career Mode</button>
         <button type="button" class="btn btn-warn" id="btn-start-exam">Live Exam</button>
         <button type="button" class="btn" id="btn-start-sandbox">Free Sandbox</button>
+        <button type="button" class="btn" id="btn-title-install" style="border-color:var(--healthy);color:var(--healthy)">
+          <svg width="16" height="16"><use href="#ic-download"/></svg><span>Download App</span>
+        </button>
       </div>
       <div class="title-meta" id="title-progress-summary">Rank 1 Trainee · 0/85 Faults Solved</div>
     </div>
@@ -881,6 +928,26 @@
       </div>
       <div class="modal-body" id="exam-modal-body"></div>
     </div>
+  </div>
+
+  <!-- Student App Install Guide Modal (iOS Safari / Fallback + Update) -->
+  <div id="modal-install" class="modal-backdrop" role="dialog" aria-label="Download TEG Rig Operator">
+    <div class="modal-box" style="max-width:480px">
+      <div class="modal-head">
+        <div>
+          <div class="kicker" style="color:var(--healthy)">Offline Student App (PWA)</div>
+          <div style="font-size:18px;font-weight:700;text-transform:uppercase">Download TEG Rig Operator</div>
+        </div>
+        <button type="button" class="btn btn-sm" id="btn-close-install">Close</button>
+      </div>
+      <div class="modal-body" id="install-modal-body"></div>
+    </div>
+  </div>
+
+  <!-- Non-Intrusive Offline Status Indicator -->
+  <div id="offline-chip" role="status" aria-live="polite">
+    <span class="offline-dot"></span>
+    <span>Offline Mode — Cached</span>
   </div>
   <script type="module">
     function showFallback(msg) {
@@ -3303,6 +3370,7 @@
       } else if (state.activeDrawer === 'menu') {
         const modeCard = document.createElement('div');
         modeCard.className = 'inst-box';
+        const pwaState = window.__TEG_PWA__ ? window.__TEG_PWA__.getStatus() : { isInstalled: false, isInstallable: false, isIOS: false, isOnline: navigator.onLine };
         modeCard.innerHTML = `<div class="kicker">Game Modes &amp; View</div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px">
             <button type="button" class="btn btn-sm" id="mn-career">Career Mode</button>
@@ -3311,7 +3379,10 @@
             <button type="button" class="btn btn-sm" id="mn-fs">Fullscreen</button>
             <button type="button" class="btn btn-sm" id="mn-sound">Audio: ${state.soundEnabled ? 'ON' : 'OFF'}</button>
             <button type="button" class="btn btn-sm" id="mn-reset">Reset Loop</button>
-          </div>`;
+          </div>
+          ${pwaState.isInstalled
+            ? '<div style="margin-top:4px;font-size:11px;font-family:var(--font-mono);color:var(--healthy)">APP INSTALLED · OFFLINE READY</div>'
+            : '<button type="button" class="btn btn-sm" id="mn-install" style="width:100%;margin-top:4px;border-color:var(--healthy);color:var(--healthy)">Download / Install App</button>'}`;
         modeCard.querySelector('#mn-career').addEventListener('click', () => { closeDrawer(); openCareerModal(); });
         modeCard.querySelector('#mn-exam').addEventListener('click', () => { closeDrawer(); openExamSetupModal(); });
         modeCard.querySelector('#mn-cinema').addEventListener('click', () => toggleCinemaMode(true));
@@ -3328,6 +3399,10 @@
           showToast('Loop restored to clean design nominal.', 'var(--dry-gas)');
           renderDrawerContent();
         });
+        const mnInstall = modeCard.querySelector('#mn-install');
+        if (mnInstall) {
+          mnInstall.addEventListener('click', () => { closeDrawer(); triggerStudentInstall(); });
+        }
         body.appendChild(modeCard);
 
         // Camera Presets & Speed & Quality
@@ -3697,6 +3772,78 @@
       if (state.mode === 'exam') openExamDiagnosisModal();
       else openCareerModal();
     });
+
+    // =========================================================================
+    // PWA INSTALL UI & OFFLINE INDICATOR
+    // =========================================================================
+    function openInstallGuideModal(pwa) {
+      const body = document.getElementById('install-modal-body');
+      const modal = document.getElementById('modal-install');
+      if (!body || !modal) return;
+      const isIOS = pwa && pwa.isIOS;
+      body.innerHTML = isIOS
+        ? `<p style="font-size:13px;color:var(--text-muted)">Install <strong>TEG Rig Operator</strong> on your iPhone or iPad to run full-screen in landscape and practice offline:</p>
+           <ol class="install-steps">
+             <li>Tap the <strong>Share</strong> icon in the Safari toolbar.</li>
+             <li>Scroll down and tap <strong>Add to Home Screen</strong>.</li>
+             <li>Tap <strong>Add</strong>, then launch <strong>TEG Rig</strong> from your Home Screen.</li>
+           </ol>
+           <div class="inst-box" style="font-size:12px;color:var(--dry-gas)">3D Three.js models and course missions cache automatically for offline classroom use.</div>`
+        : `<p style="font-size:13px;color:var(--text-muted)">Install <strong>TEG Rig Operator</strong> directly to your phone, tablet, or laptop so it opens like a native app and works offline:</p>
+           <ol class="install-steps">
+             <li><strong>Chrome / Edge (Desktop):</strong> Click the <strong>Install</strong> icon on the right side of the address bar, or open browser Menu (&vellip;) &rarr; <strong>Save and share / Cast, save, and share &rarr; Install TEG Rig Operator</strong>.</li>
+             <li><strong>Android Chrome:</strong> Open browser Menu (&vellip;) &rarr; <strong>Add to Home screen &rarr; Install</strong>.</li>
+             <li><strong>iOS Safari:</strong> Tap <strong>Share</strong> &rarr; <strong>Add to Home Screen</strong>.</li>
+           </ol>
+           <div class="inst-box" style="font-size:12px;color:var(--dry-gas)">${pwa && pwa.offlineReady ? 'Offline cache is ready on this device.' : 'Keep this tab open briefly on first visit to finish caching 3D assets for offline use.'}</div>`;
+      modal.classList.add('open');
+    }
+
+    async function triggerStudentInstall() {
+      const bridge = window.__TEG_PWA__;
+      if (!bridge) {
+        openInstallGuideModal({ isIOS: /iphone|ipad|ipod/i.test(navigator.userAgent), offlineReady: false });
+        return;
+      }
+      const pwa = bridge.getStatus();
+      if (pwa.isInstalled) {
+        showToast('TEG Rig Operator is already installed.', 'var(--healthy)');
+        return;
+      }
+      if (pwa.isInstallable) {
+        const result = await bridge.install();
+        if (result === 'accepted') {
+          showToast('Installing TEG Rig Operator for offline use.', 'var(--healthy)');
+        }
+        return;
+      }
+      openInstallGuideModal(pwa);
+    }
+
+    function syncPwaUi(pwa) {
+      const titleBtn = document.getElementById('btn-title-install');
+      if (titleBtn) {
+        titleBtn.style.display = pwa.isInstalled ? 'none' : 'inline-flex';
+      }
+      const offlineChip = document.getElementById('offline-chip');
+      if (offlineChip) {
+        offlineChip.classList.toggle('show', !pwa.isOnline);
+      }
+      if (state.activeDrawer === 'menu') {
+        renderDrawerContent();
+      }
+    }
+
+    document.getElementById('btn-title-install').addEventListener('click', triggerStudentInstall);
+    document.getElementById('btn-close-install').addEventListener('click', () => {
+      document.getElementById('modal-install').classList.remove('open');
+    });
+    if (window.__TEG_PWA__) {
+      window.__TEG_PWA__.subscribe(syncPwaUi);
+    } else {
+      window.addEventListener('teg-pwa-status', (e) => syncPwaUi(e.detail));
+      syncPwaUi({ isInstalled: false, isInstallable: false, isIOS: false, isOnline: navigator.onLine });
+    }
 
     window.addEventListener('keydown', (e) => {
       registerUserActivity();
